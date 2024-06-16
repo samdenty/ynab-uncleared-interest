@@ -1,18 +1,18 @@
-export TOKEN="INSERT_YNAB_TOKEN"
-export BUDGET="INSERT_YNAB_BUDGET_ID"
-export ACCOUNT="INSERT_YNAB_ACCOUNT_ID"
+TOKEN="INSERT_YNAB_TOKEN"
+BUDGET="INSERT_YNAB_BUDGET_ID"
+ACCOUNT="INSERT_YNAB_ACCOUNT_ID"
 
 # Insert the APR (Annual percentage rate) you are earning on the above account
 # For example:
 #  "0.3" => 0.3%
 #  "2" => 2%
 #  "4" => 4%
-export RATE_APR="4"
+RATE_APR="4"
 
 # Insert how often the interest is calculated from balance
 # For example, "1 day" or "2 days" or "1 week"
-export CALCULATED="1 day"
+CALCULATED="1 day"
 
 # Insert how often the interest is paid out
 # For example, "1 day" or "1 week" or "1 month"
-export PAYOUT="1 month"
+PAYOUT="1 month"

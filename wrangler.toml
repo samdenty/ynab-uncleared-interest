@@ -1,0 +1,7 @@
+#:schema node_modules/wrangler/config-schema.json
+compatibility_date = "2024-06-14"
+main = "src/worker.ts"
+name = "ynab-uncleared-interest"
+
+[triggers]
+crons = ["0 * * * *"]
