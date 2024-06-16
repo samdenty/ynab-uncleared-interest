@@ -26,7 +26,7 @@ export async function calculateInterest(
 		return;
 	}
 
-	let date = day(startTransaction.date).startOf('year');
+	let date = day(startTransaction.date);
 
 	let balance = 0;
 	let accruedInterest = 0;
@@ -63,6 +63,8 @@ export async function calculateInterest(
 		const calculatedInterest = (((balance / 100) * rateApr) / daysInYear) * daysInCalculation;
 
 		accruedInterest += calculatedInterest;
+
+		console.log(payout.formatted, calculation.formatted, calculatedInterest, accruedInterest);
 
 		date = calculation.next.start;
 
