@@ -1,5 +1,5 @@
 {
-  "name": "ynab-interest-calculator",
+  "name": "ynab-uncleared-interest",
   "scripts": {
     "start": "ts-node --esm src/index.ts"
   },
