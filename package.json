@@ -1,0 +1,11 @@
+{
+  "name": "ynab-interest-calculator",
+  "scripts": {
+    "start": "ts-node --esm src/index.ts"
+  },
+  "type": "module",
+  "dependencies": {
+    "ynab": "^2.2.0",
+    "dayjs": "^1.11.11"
+  }
+}
