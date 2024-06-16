@@ -36,7 +36,7 @@ let date = day(startTransaction.date).startOf("year");
 let balance = 0;
 let accruedInterest = 0;
 
-// iterate through all months up to current
+// go through each calculation interval up to the current date
 while (date.isBefore() || date.isSame()) {
   const startYear = date.startOf("year");
   const endYear = date.endOf("year");
