@@ -3,15 +3,15 @@
 	"scripts": {
 		"deploy": "wrangler deploy",
 		"start": "tsx src/index.ts",
-		"dev": "tsx src/index.ts",
-		"cf-typegen": "wrangler types"
+		"dev": "tsx src/index.ts"
 	},
 	"type": "module",
 	"dependencies": {
 		"@cloudflare/workers-types": "^4.20240614.0",
 		"@types/node": "^20.14.2",
-		"dayjs": "^1.11.11",
 		"dotenv": "^16.4.5",
+		"moment": "^2.30.1",
+		"toml": "^3.0.0",
 		"tsx": "^4.15.5",
 		"typescript": "^5.0.4",
 		"wrangler": "^3.0.0",
