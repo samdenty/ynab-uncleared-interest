@@ -225,7 +225,6 @@ function parseEnvAccount(account: Env['ACCOUNTS'][number]): AccountWithInterest 
 		}
 
 		const aprDate = moment(date, 'L');
-		console.log(date, aprDate.toString());
 		if (!aprDate.isValid()) {
 			throw new Error(`APR date not valid, received '${date}'`);
 		}
