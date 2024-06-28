@@ -1,5 +1,8 @@
 import { API, SaveTransactionWithId } from 'ynab';
 import moment, { Moment, unitOfTime } from 'moment';
+import chalk from 'chalk';
+import stripAnsi from 'strip-ansi';
+
 type RateApr = string;
 
 type AccountRateAfterDate = readonly [Date | Moment, RateApr];
@@ -39,14 +42,22 @@ export async function calculateInterest(token: string, budgetId: string, account
 
 		let balance = 0;
 		let accruedInterest = 0;
+		let payoutUnits = 0;
 
 		// go through each calculation interval up to the current date
-		while (date.isSameOrBefore()) {
+		while (date.isBefore(undefined, calculatedUnit)) {
 			const startYear = date.clone().startOf('year');
 			const endYear = date.clone().endOf('year');
 
 			const calculation = calculateInterval(calculatedInterval, calculatedUnit, date);
 			const payout = calculateInterval(payoutInterval, payoutUnit, date);
+			if (payoutUnits !== payout.units) {
+				if (payoutUnits) {
+					console.groupEnd();
+				}
+				payoutUnits = payout.units;
+				console.group(payout.formatted);
+			}
 
 			const daysInYear = endYear.diff(startYear, 'day');
 			const daysInCalculation = calculation.end.diff(calculation.start, 'day');
@@ -77,7 +88,7 @@ export async function calculateInterest(token: string, budgetId: string, account
 
 			accruedInterest += calculatedInterest;
 
-			console.log(payout.formatted, calculation.formatted, calculatedInterest, accruedInterest);
+			console.log(calculation.formatted, calculatedInterest, accruedInterest);
 
 			date = calculation.next.start;
 
@@ -94,6 +105,8 @@ export async function calculateInterest(token: string, budgetId: string, account
 			return transaction.payee_name === 'Interest' && date.isAfter(payout.start) && date.isBefore(payout.next.start);
 		});
 
+		console.log();
+
 		if (payoutTransaction) {
 			if (payoutTransaction.cleared === 'cleared') {
 				console.log('Payout transaction already cleared', payoutTransaction);
@@ -108,7 +121,7 @@ export async function calculateInterest(token: string, budgetId: string, account
 			date: moment().format('YYYY-MM-DD'),
 			amount: Math.round(accruedInterest),
 			cleared: 'uncleared',
-			memo: `for ${payout.formatted}`,
+			memo: `for ${stripAnsi(payout.formatted)}`,
 			payee_name: 'Interest',
 			flag_color: 'purple',
 			account_id: id,
@@ -117,6 +130,10 @@ export async function calculateInterest(token: string, budgetId: string, account
 		console.log(payoutTransaction);
 
 		transactionsToUpdate.push(payoutTransaction);
+
+		if (payoutUnits) {
+			console.groupEnd();
+		}
 
 		console.groupEnd();
 	}
@@ -137,12 +154,12 @@ function calculateInterval(interval: number, unit: unitOfTime.DurationAs, date: 
 	const start = startYear.clone().add(count * interval, unit);
 	const end = start.clone().add(interval, unit);
 
-	let formatted = start.format('DD/MM/YYYY');
+	const normalizedUnit = moment.normalizeUnits(unit);
+	const format = normalizedUnit === 'year' ? 'YYYY' : normalizedUnit === 'month' ? 'M/YYYY' : 'DD/M/YYYY';
 
-	if (alwaysFormatAsRange || interval !== 1) {
-		const todayOrEnd = end.isAfter() ? moment() : end;
-
-		formatted += `-${todayOrEnd.format('DD/MM/YYYY')}`;
+	let formatted = chalk.cyanBright(start.format(format));
+	if (alwaysFormatAsRange || interval !== 1 || normalizedUnit !== 'day') {
+		formatted = `[${chalk.yellow(start.format(format))} to ${chalk.yellowBright(end.format(format))}]`;
 	}
 
 	return {
@@ -150,6 +167,9 @@ function calculateInterval(interval: number, unit: unitOfTime.DurationAs, date: 
 		formatted,
 		start,
 		end,
+		get previous() {
+			return calculateInterval(interval, unit, start.subtract(1, unit));
+		},
 		get next() {
 			return calculateInterval(interval, unit, end);
 		},
