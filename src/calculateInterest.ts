@@ -1,4 +1,4 @@
-import { API, SaveTransactionWithId } from 'ynab';
+import { API, SaveTransactionWithIdOrImportId } from 'ynab';
 import moment, { Moment, unitOfTime } from 'moment';
 import chalk from 'chalk';
 import stripAnsi from 'strip-ansi';
@@ -24,13 +24,10 @@ export async function calculateInterest(token: string, budgetId: string, account
 		return;
 	}
 
-	const transactionsToUpdate: SaveTransactionWithId[] = [];
+	const transactionsToUpdate: SaveTransactionWithIdOrImportId[] = [];
 
 	for (const { id, rate: rates, calculatedInterval, calculatedUnit, payoutInterval, payoutUnit } of accounts) {
-		const response = await ynabAPI.transactions.getTransactionsByAccount(budgetId, id);
-
-		const { transactions } = response.data;
-
+		const transactions = await ynabAPI.transactions.getTransactionsByAccount(budgetId, id).then(({ data }) => data.transactions);
 		const [startTransaction] = transactions;
 		if (!startTransaction) {
 			continue;
@@ -99,10 +96,14 @@ export async function calculateInterest(token: string, budgetId: string, account
 
 		const payout = calculateInterval(payoutInterval, payoutUnit, date, true);
 
-		let payoutTransaction: SaveTransactionWithId | undefined = transactions.find((transaction) => {
-			const date = moment.utc(transaction.date).startOf('day');
+		let payoutTransaction: SaveTransactionWithIdOrImportId | undefined = transactions.find((transaction) => {
+			const date = moment.utc(transaction.date).startOf(calculatedUnit);
 
-			return transaction.payee_name === 'Interest' && date.isAfter(payout.start) && date.isBefore(payout.next.start);
+			if (transaction.payee_name !== 'Interest') {
+				return false;
+			}
+
+			return date.isAfter(payout.start, calculatedUnit) && date.isSameOrBefore(payout.next.start, calculatedUnit);
 		});
 
 		console.log();
@@ -159,7 +160,10 @@ function calculateInterval(interval: number, unit: unitOfTime.DurationAs, date: 
 
 	let formatted = chalk.cyanBright(start.format(format));
 	if (alwaysFormatAsRange || interval !== 1 || normalizedUnit !== 'day') {
-		formatted = `[${chalk.yellow(start.format(format))} to ${chalk.yellowBright(end.format(format))}]`;
+		const formattedStart = start.format(format);
+		const formattedEnd = end.isAfter() ? end.format('DD/M/YYYY') : end.format(format);
+
+		formatted = `[${chalk.yellow(formattedStart)} to ${chalk.yellowBright(formattedEnd)}]`;
 	}
 
 	return {

@@ -891,10 +891,10 @@ xxhash-wasm@^1.0.1:
   resolved "https://registry.yarnpkg.com/xxhash-wasm/-/xxhash-wasm-1.0.2.tgz#ecc0f813219b727af4d5f3958ca6becee2f2f1ff"
   integrity sha512-ibF0Or+FivM9lNrg+HGJfVX8WJqgo+kCLDc4vx6xMeTce7Aj+DLttKbxxRR/gNLSAelRc1omAPlJ77N/Jem07A==
 
-ynab@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/ynab/-/ynab-2.2.0.tgz#bcc3cdf12768ed51be2bbc21f4780311cc7bb1e4"
-  integrity sha512-07RFqEqhoIxge1JzYriMDxTyX2yEhKhUxHATzIx2V81hQYQs0UV7ieZ5dvUaSbE+05wWAg+tbScfh2PxghmkwA==
+ynab@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/ynab/-/ynab-2.4.0.tgz#492d9f7c56bcb8e79e33e6c2d6d532d3fae0424f"
+  integrity sha512-4fWY4oakic0mKc0EYYadoaEznTKyPMU/N3qz8O7O8WRsJ9U8ze+xa0Gb8ZtSM7F88NjnyZRz0+i2qRc9WUxzsg==
   dependencies:
     fetch-ponyfill "^7.1.0"
 
